@@ -3,16 +3,19 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
- #include <sys/socket.h>
- #include <netinet/in.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <netdb.h>
+
+/**
+* This a simple client using socket.
+* Created by Soyn. 15/09/15.
+**/
 
 ///
 /// <summary>a system call fails, this function will be called.</summary>
 /// <para name = "msg"> the message about the error. </para name>
 ///
-
-
 void error(char *msg)
 {
     perror(msg);
