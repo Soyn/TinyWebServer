@@ -15,16 +15,12 @@ void Server :: error(const char* msg)
 ///constructor
 Server :: Server(int argc, char **argv)
 {
-    std ::cout << "Constructor" << std:: endl;
-    std ::cout << argc << std :: endl;
-    std :: cout << *argv << std :: endl;
     this -> argc = argc;
     this -> argv = argv;
 }
 ///desconstructor
 Server:: ~Server()
 {
-    std :: cout <<"Desconstructor" << std :: endl;
      close(newsockfd);
      close(sockfd);
 }
