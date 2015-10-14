@@ -33,13 +33,15 @@ public:
     void WriteMessage();
     void Run();
     void error(const char*);
+    void dostuff(int sock);
 private:
-    int sockfd, newsockfd, portno,n, argc;
+    int sockfd, newsockfd, portno, argc,pid,n;
     socklen_t clilen;
-    char buffer[256];
-    char **argv;
+    char **argv, buffer[256];
     sockaddr_in serv_addr, cli_addr;
 };
+
+
 #endif // SERVER_CPP_H_INCLUDED
 
 

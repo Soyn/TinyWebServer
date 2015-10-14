@@ -1,10 +1,10 @@
-#include "Server_cpp.h"
+#include "Server.h"
 #include <cerrno>
 #include<cstdio>
 
 /**
 * This is a simple web server by c++.
-* Created by Sony. 15/09/15.
+* Created by Soyn. 15/09/15.
 **/
 void Server :: error(const char* msg)
 {
@@ -84,7 +84,24 @@ void Server :: EstablishConnect()
 {
     clilen = sizeof(cli_addr);
     newsockfd = accept( sockfd, ( sockaddr*) &cli_addr, &clilen);
-    AcceptError();
+    while(1)
+    {
+        //establish the connection0
+        newsockfd = accept(sockfd, (sockaddr*) &cli_addr, &clilen);
+        AcceptError();
+
+        pid = fork();      //create a new process to handle this connection
+        if(pid < 0)
+            error("Error on accept");
+        if(pid == 0)
+        {
+            close(sockfd);
+            dostuff(newsockfd);
+            exit(0);  // the process exits
+        }
+        else
+            close(newsockfd);  // the parent closes the newsockfd
+    }/*end of while*/
 }
 
 void Server:: ReadMessage()
@@ -111,6 +128,20 @@ void Server :: Run()
     WriteMessage();
 }
 
+///
+/// <summary>Handles all communication once a connection has been established</summary>
+/// <para name = "sock">socket file description</para name>
+///
+void Server :: dostuff(int sock)
+{
+
+    bzero(buffer,256);
+    n = read(sock,buffer,255);
+    if(n < 0) error("ERROR reading from socket");
+    std :: cout << "Here is the message: " << buffer << std :: endl;
+    n = write(sock,"I get your message", 18);
+    if(n < 0) error("Error writing to socket");
+}
 int main(int argc, char **argv)
 {
     Server s1(argc, argv);
