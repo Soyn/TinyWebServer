@@ -11,13 +11,26 @@
 
 using std :: string;
 
-HttpServer :: HttpServer(int argc, char **argv)
-{
-    this -> argc = argc;
-    this -> argv = argv;
-}
+ struct node{
+     string ext;
+     string filetype;
+}Extensions[] = {
+    {"gif","image/gif"},
+    {"jpg","image/jpg"},
+    {"jpeg","image/jpeg"},
+    {"png","image/png"},
+    {"ico","image/ico"},
+    {"zip","image/zip"},
+    {"gz","image/gz"},
+    {"tar","image/tar"},
+    {"htm","text/html"},
+    {"html","text/html"},
+    {"0","0"}};
 
-void Error :: NotSupportErrot()
+
+
+
+void Error :: NotSupportError()
 {
     if(argc < 3 || argc > 3 || !strcmp(argv[1],"-?")){
         std :: cout <<"hint: nweb Port-Number Top-Directory\t\t" << VERSION << "\n\n\tnweb is a small and very safe mini web server\n\tnweb only servers out file /web pages with extensions named below\n\tand only from the named directory or its sub-directories.\n\tThere is no fancy features = safe and secure.\n\n\tExample:newb 8181/home/nwebdir&\n\n\tOnly Supports:" << std :: endl;
@@ -42,7 +55,7 @@ void Error :: ChangeDirectoryError()
         exit(4);
     }
 }
-void HttpServer :: Logger(const int &type,string s1, string s2,int& socket_fd)
+void HttpServer :: Logger(const int &type,string s1, string s2,int socket_fd)
 {
      int fd;
      string bufferlog;
@@ -52,7 +65,6 @@ void HttpServer :: Logger(const int &type,string s1, string s2,int& socket_fd)
     switch(type){
         case ERROR:
                     stringStream << "ERROR: " << s1 << " " << s2 << " Errno = " << errno << " exiting " << "pid = " << getpid();
-                    bufferlog = stringStream.str();
                     break;
         case FORBIDDEN:
         //<summary>int write(int s ,char* buf,int len)</summary>
@@ -188,9 +200,95 @@ void HttpServer :: Web(int fd, int hit)
     exit(1);
 
 }
+
 void HttpServer :: InsertPacket()
 {
     Packets[403] = " 403 Forbidden\nConnect-Length: 185\nConnection:close\nContent-Type:\ttext/html\n\n<html><head>\n<title>403 Forbidden</title>\n</head><body>\n<h1>Forbidden</h1>\nThe requested URL, file type or operation is not allowed on  this simple static file webserver.\n</body></html>";
     Packets[404] = "HTTP/1.1 404 Not Found\nContent-Length: 136\nConnection:close\nConnext-Type:\ttet/html\n\n<html><head>\n<title>404\tNot Found</title>\n</head><body>\n<h1>Not Found</h1>\nThe requested URL was not found on this server.\n</body></html>\n";
+}
+
+void HttpServer :: CreateSocket()
+{
+    if(argc < 3 || argc > 3 || !strcmp(argv[1],"-?")){
+        std :: cout << "hint: nweb Port-Number Top-Directory\t\tversion" << VERSION << "\n\n" << "\tnweb only servers out file/web pages with extensions named below\n\tand only from named directory or its sub-directories.\n\tThere is no fancy feature = safe and secure.\n\n\tExample: nweb 8181 /home/nwebdir&\n\n\tOnly Supports:";
+        for(int i = 0; Extensions[i].ext != "0";++i ){
+            std :: cout << Extensions[i].ext;
+        }
+    std :: cout << "Not supported:URLs including\"..\", Java Javascript,CGI\n\tNot Supported: directories //etc/bin/lib/tmp/usr/dev/sbin\n ";
+    exit(0);
+    }
+    if( !strncmp(argv[2],"/",2) || !strncmp(argv[2],"/etc",5) || !strncmp(argv[2],"/bin",5) || !strncmp(argv[2],"/lib",5)|| !strncmp(argv[2],"/tmp",5) || !strncmp(argv[2],"/usr",5) || !strncmp(argv[2],"/dev",5) || !strncmp(argv[2],"/dev",5) || !strncmp(argv[2],"/sbin",6)){
+        Error e;
+        e.DirectoryError();
+    }
+
+    if(chdir(argv[2]) == -1){
+        Error e;
+        e.ChangeDirectoryError();
+    }
+}
+
+///
+/// <summary>become deamon + unstopable and no zombies children<summary>
+///
+void HttpServer :: ForkProcess()
+{
+    int i;
+    string temp1("new starting"),temp2(argv[1]);
+    if(fork() != 0) //parent return OK to shell
+        return ;
+    (void)signal(SIGCHLD,SIG_IGN);//ignore child death
+    (void)signal(SIGHUP, SIG_IGN);//ignore terminal hangups
+    (void)signal(SIGHUP,SIG_IGN);
+
+    for( i = 0; i < 32; ++i)
+        (void)close(i); //close open files
+
+    (void)setpgrp(); //break away from process group
+     Logger(LOG, temp1,temp2, getpid());
+
+}
+
+void HttpServer :: SetUpSocket()
+{
+
+    string s1("system call"), s2("socket"),s3("Invaild port number (try 1 -> 6000)"),s4(argv[1]);
+    if((listenfd = socket(AF_INET, SOCK_STREAM,0)) < 0)
+        Logger(ERROR,s1,s2,0);
+    port = atoi(argv[1]);
+
+    if( port < 0 || port > 60000)
+        Logger(ERROR, s3,s4,0);
+}
+
+void HttpServer :: SetUpSocketAddress()
+{
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serv_addr.sin_port = htons(port);
+}
+
+void HttpServer:: EstablishConnect()
+{
+    string s1("system call"),s2("bind"),s3("listen"),s4("accept"), s5("fork");
+    if( bind(listenfd, (sockaddr*) &serv_addr, sizeof(serv_addr)) < 0 )
+        Logger(ERROR, s1, s2,0);
+    if( listen(listenfd, 64) < 0)
+        Logger(ERROR,s1, s3,0);
+    for( hit = 1;;++hit){
+        length = sizeof(cli_addr);
+        if((socketfd = accept(listenfd, (sockaddr *) &cli_addr, &length)) < 0 )
+            Logger(ERROR,s1,s4,0);
+        if( (pid = fork()) < 0){
+            Logger(ERROR, s1,s5,0);
+        }else{
+            if( pid == 0){   // this child
+                (void)close(listenfd);
+                Web(socketfd,hit); //never returns
+            }else{ //parent
+                (void)close(socketfd);
+            }
+        }
+    }
 }
 

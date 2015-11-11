@@ -30,36 +30,25 @@
 #define FORBIDDEN 403
 #define NOTFOUND 404
 
-struct {
-    std :: string ext;
-    std :: string filetype;
-}Extensions[] = {
-    {"gif","image/gif"},
-    {"jpg","image/jpg"},
-    {"jpeg","image/jpeg"},
-    {"png","image/png"},
-    {"ico","image/ico"},
-    {"zip","image/zip"},
-    {"gz","image/gz"},
-    {"tar","image/tar"},
-    {"htm","text/html"},
-    {"html","text/html"},
-    {"0","0"}};
+
 
 class Error;
 class HttpServer{
 public:
     friend class Error;
-    HttpServer();
-    HttpServer(int,char**);
-    ~HttpServer();
+    HttpServer(){}
+    HttpServer(int arc,char**arv):argc(arc),argv(arv){}
+    ~HttpServer(){}
     void Web(int,int);
-    void  Logger(const int&, std :: string, std :: string ,int&);
+    void Logger(const int&, std :: string, std :: string ,int);
     void InsertPacket();
     void CreateSocket();
-    void SetServerAdd();
+    void ForkProcess();
+    void SetUpSocket();
+    void SetUpSocketAddress();
     void EstablishConnect();
 private:
+
     std :: map<int,std :: string> Packets;
     int argc;
     char **argv;
@@ -71,9 +60,10 @@ private:
 
 class Error{
 public:
+    Error(){}
     Error(HttpServer &tmp):argc(tmp.argc),argv(tmp.argv){}
-    ~Error();
-    void NotSupportErrot();
+    ~Error(){}
+    void NotSupportError();
     void DirectoryError();
     void ChangeDirectoryError();
 private:
@@ -81,3 +71,4 @@ private:
     char **argv;
 };
 #endif
+
