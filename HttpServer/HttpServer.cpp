@@ -9,11 +9,9 @@
 #include "HttpServer.h"
 
 
-using std :: string;
-
  struct node{
-     string ext;
-     string filetype;
+    std :: string ext;
+    std :: string filetype;
 }Extensions[] = {
     {"gif","image/gif"},
     {"jpg","image/jpg"},
@@ -27,16 +25,21 @@ using std :: string;
     {"html","text/html"},
     {"0","0"}};
 
-
+using std :: string;
 
 
 void Error :: NotSupportError()
 {
     if(argc < 3 || argc > 3 || !strcmp(argv[1],"-?")){
-        std :: cout <<"hint: nweb Port-Number Top-Directory\t\t" << VERSION << "\n\n\tnweb is a small and very safe mini web server\n\tnweb only servers out file /web pages with extensions named below\n\tand only from the named directory or its sub-directories.\n\tThere is no fancy features = safe and secure.\n\n\tExample:newb 8181/home/nwebdir&\n\n\tOnly Supports:" << std :: endl;
-    for(size_t i = 0; Extensions[i].ext != "0"; ++i)
-        std :: cout << Extensions[i].ext;
+        std :: cout <<"hint: nweb Port-Number Top-Directory\t\t" << VERSION << "\n\n\tnweb is a small and very safe mini web server\n\tnweb only servers out file /web pages with extensions named below\n\tand only from the named directory or its sub-directories.\n\tThere is no fancy features = safe and secure.\n\n\tExample:newb 8181/home/nwebdir&\n\tOnly Supports: ";
 
+    for(size_t i = 0; Extensions[i].ext != "0"; ++i){
+        if(i == 0)
+            std :: cout <<"\n\n\t";
+        std :: cout << Extensions[i].ext << " ";
+
+    }
+        std :: cout << "\n";
         std :: cout << "\n\tNot Supported: URLs including\"..\",Java, Javascript, CGI\n \tNot Supported: directories //etc /bin/lib/tmp/usr/dev/sbin\n" << std :: endl;
         exit(0);
     }
@@ -268,6 +271,7 @@ void HttpServer :: SetUpSocketAddress()
     serv_addr.sin_port = htons(port);
 }
 
+
 void HttpServer:: EstablishConnect()
 {
     string s1("system call"),s2("bind"),s3("listen"),s4("accept"), s5("fork");
@@ -292,3 +296,24 @@ void HttpServer:: EstablishConnect()
     }
 }
 
+
+/*
+* Following is the main body to run the server.
+*/
+
+Main :: Main(int _argc, char **_argv)
+{
+    MyServer.argc = e.argc = _argc;
+    MyServer.argv = e.argv = _argv;
+}
+
+void Main :: RunServer()
+{
+    e.NotSupportError();
+    e.DirectoryError();
+    e.ChangeDirectoryError();
+    MyServer.ForkProcess();
+    MyServer.SetUpSocket();
+    MyServer.SetUpSocketAddress();
+    MyServer.EstablishConnect();
+}

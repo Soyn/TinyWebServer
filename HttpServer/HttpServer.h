@@ -1,7 +1,7 @@
 /*************************************************************************
 	> File Name: HttpServer.h
-	> Author:
-	> Mail:
+	> Author: Soyn
+	> @Brief: The simple http server.
 	> Created Time: Sat 31 Oct 2015 09:50:30 AM CST
  ************************************************************************/
 
@@ -35,9 +35,7 @@
 class Error;
 class HttpServer{
 public:
-    friend class Error;
     HttpServer(){}
-    HttpServer(int arc,char**arv):argc(arc),argv(arv){}
     ~HttpServer(){}
     void Web(int,int);
     void Logger(const int&, std :: string, std :: string ,int);
@@ -47,13 +45,14 @@ public:
     void SetUpSocket();
     void SetUpSocketAddress();
     void EstablishConnect();
+
+
+    int argc;
+    char ** argv;
 private:
 
     std :: map<int,std :: string> Packets;
-    int argc;
-    char **argv;
     int port,pid,listenfd,socketfd,hit;
-    /*static initialised to zero*/
     socklen_t length;
     sockaddr_in cli_addr,serv_addr;
 };
@@ -61,14 +60,24 @@ private:
 class Error{
 public:
     Error(){}
-    Error(HttpServer &tmp):argc(tmp.argc),argv(tmp.argv){}
     ~Error(){}
     void NotSupportError();
     void DirectoryError();
     void ChangeDirectoryError();
-private:
+
+
     int argc;
     char **argv;
 };
-#endif
 
+class Main{
+public:
+    /*initialize the data*/
+    Main(int, char **);
+    void RunServer();
+    ~Main(){}
+private:
+    HttpServer MyServer;
+    Error e;
+};
+#endif
