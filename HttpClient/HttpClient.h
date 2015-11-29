@@ -20,7 +20,7 @@
 
 
 #define PORT 8181
-#define IP_ADDRESS "192.168.0.1"
+#define IP_ADDRESS "192.168.0.146"
 #define BUFSIZE 8196
 
 

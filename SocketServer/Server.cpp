@@ -1,6 +1,8 @@
 #include "Server.h"
 #include <cerrno>
 #include<cstdio>
+#define BUFSIZE 1024
+
 
 /**
 * This is a simple web server by c++.
@@ -59,7 +61,7 @@ void Server :: CreateSocket()
 void Server :: SetServerAdd()
 {
     bzero((char*)&serv_addr, sizeof(serv_addr));
-    portno = std::atoi(argv[1]);    //convert the port number from string of digits to an interger
+    portno = atoi(argv[1]);    //convert the port number from string of digits to an interger
     serv_addr.sin_family = AF_INET; //must be AF_INET which contain a code for the address family
     serv_addr.sin_addr.s_addr = INADDR_ANY; //INADDR_ANY will get the IP address on which server runs.
     serv_addr.sin_port = htons(portno); //convert the port number in host byte order to network order
@@ -104,10 +106,10 @@ void Server :: Run()
 void Server :: dostuff(int& sock)
 {
     int n;
-    char buffer[256];
+    char buffer[BUFSIZE];
 
-    bzero(buffer,256);
-    n = read(sock,buffer,255);
+    bzero(buffer,BUFSIZE);
+    n = read(sock,buffer,BUFSIZE - 1);
     if(n < 0) error("ERROR reading from socket");
     std :: cout << "Here is the message: " << buffer << std :: endl;
     n = write(sock,"I get your message", 18);
