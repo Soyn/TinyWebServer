@@ -44,6 +44,9 @@ void Error :: NotSupportError()
         exit(0);
     }
 }
+///
+/// <summary> put the files in system directory is forbidden(eg: '/', '/etc','/bin')</summary>
+///
 void Error :: DirectoryError()
 {
     if( !strncmp(argv[2],"/",2) || !strncmp(argv[2],"/etc",5) || !strncmp(argv[2],"/bin",5) || !strncmp(argv[2],"/lib",5) || !strncmp(argv[2], "/tmp",5) || !strncmp(argv[2],"/usr",5) || !strncmp(argv[2],"/dev",5) || !strncmp(argv[2], "/sbin",6)){
@@ -51,6 +54,10 @@ void Error :: DirectoryError()
         exit(3);
     }
 }
+///
+/// <summary> To change the working directory</summary>
+/// <hint> To search chdir() to know more</hint>
+///
 void Error :: ChangeDirectoryError()
 {
     if(chdir(argv[2]) == -1){
@@ -101,6 +108,7 @@ void HttpServer :: Web(int fd, int hit)
     long i, ret, len;
     const char *fstr;
     static string  buffer;
+    string tmp1("failed to read brower request"), tmp2("");
 
     //*{ following is to convert the string to c-style string.
 
@@ -117,8 +125,6 @@ void HttpServer :: Web(int fd, int hit)
     ret = read(fd, copyBuffer, BUFFSIZE);
 
     if( ret == 0 || ret == -1){ /*read failure stop now*/
-        string tmp1 = "failed to read brower request";
-        string tmp2 = "";
         Logger(FORBIDDEN, tmp1,tmp2,fd);
     }
 
@@ -296,11 +302,9 @@ void HttpServer:: EstablishConnect()
     }
 }
 
-
-/*
-* Following is the main body to run the server.
-*/
-
+///
+/// <summary>Following is the main body to run the server. </summary>
+///
 Main :: Main(int _argc, char **_argv)
 {
     MyServer.argc = e.argc = _argc;
