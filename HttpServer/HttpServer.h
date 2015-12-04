@@ -38,10 +38,10 @@ public:
     HttpServer(){}
     ~HttpServer(){}
     void Web(int,int);
-    void Logger(const int&, std :: string, std :: string ,int);
+    void Logger(const int&, const std :: string, const std :: string ,int);
     void InsertPacket();
     void CreateSocket();
-    void ForkProcess();
+    int ForkProcess();
     void SetUpSocket();
     void SetUpSocketAddress();
     void EstablishConnect();

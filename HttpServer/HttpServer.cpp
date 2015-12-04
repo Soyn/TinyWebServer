@@ -65,7 +65,12 @@ void Error :: ChangeDirectoryError()
         exit(4);
     }
 }
-void HttpServer :: Logger(const int &type,string s1, string s2,int socket_fd)
+
+///
+/// <summary>create a log file to store the connection message</summary>
+/// <para name = "type"> the type of hint message</para name>
+/// <para name = "s1" & "s2"><>
+void HttpServer :: Logger(const int &type,const string s1, const string s2,int socket_fd)
 {
      int fd;
      string bufferlog;
@@ -102,12 +107,17 @@ void HttpServer :: Logger(const int &type,string s1, string s2,int socket_fd)
         exit(3);
 }
 
+///
+/// <summary> this a child web server prcess, so we can exit on errors</summary>
+///
+
 void HttpServer :: Web(int fd, int hit)
 {
     int j,file_fd, bufferlen;
     long i, ret, len;
     const char *fstr;
     static string  buffer;
+
     string tmp1("failed to read brower request"), tmp2("");
 
     //*{ following is to convert the string to c-style string.
@@ -118,7 +128,7 @@ void HttpServer :: Web(int fd, int hit)
     //*}
 
     // <summary> read from a file descriptor.</summary>
-    // <name> ssize read(int fd, void *buf, size_t count)</name>
+    // <function description> ssize read(int fd, void *buf, size_t count)</function description>
     // <para name = "fd"> file descriptor</para name>
     // <para name = "buf"> the buffer</para name>
     // <para name = "count"> count bytes from file descriptor.</para name>
@@ -137,7 +147,7 @@ void HttpServer :: Web(int fd, int hit)
             buffer[i] = '*';
     }
 
-    Logger(LOG,(string) "request", buffer, hit);
+    Logger(LOG,"request", buffer, hit);
 
     if( buffer.compare(0,strlen("GET"),"GET") && buffer.compare(0,strlen("get"),"get")){
         Logger(FORBIDDEN, "Only simple GET operation supported", buffer, fd);
@@ -212,7 +222,7 @@ void HttpServer :: Web(int fd, int hit)
 
 void HttpServer :: InsertPacket()
 {
-    Packets[403] = " 403 Forbidden\nConnect-Length: 185\nConnection:close\nContent-Type:\ttext/html\n\n<html><head>\n<title>403 Forbidden</title>\n</head><body>\n<h1>Forbidden</h1>\nThe requested URL, file type or operation is not allowed on  this simple static file webserver.\n</body></html>";
+    Packets[403] = "403 Forbidden\nConnect-Length: 185\nConnection:close\nContent-Type:\ttext/html\n\n<html><head>\n<title>403 Forbidden</title>\n</head><body>\n<h1>Forbidden</h1>\nThe requested URL, file type or operation is not allowed on  this simple static file webserver.\n</body></html>";
     Packets[404] = "HTTP/1.1 404 Not Found\nContent-Length: 136\nConnection:close\nConnext-Type:\ttet/html\n\n<html><head>\n<title>404\tNot Found</title>\n</head><body>\n<h1>Not Found</h1>\nThe requested URL was not found on this server.\n</body></html>\n";
 }
 
@@ -240,12 +250,12 @@ void HttpServer :: CreateSocket()
 ///
 /// <summary>become deamon + unstopable and no zombies children<summary>
 ///
-void HttpServer :: ForkProcess()
+int HttpServer :: ForkProcess()
 {
     int i;
-    string temp1("new starting"),temp2(argv[1]);
     if(fork() != 0) //parent return OK to shell
-        return ;
+        return 0;
+
     (void)signal(SIGCHLD,SIG_IGN);//ignore child death
     (void)signal(SIGHUP, SIG_IGN);//ignore terminal hangups
     (void)signal(SIGHUP,SIG_IGN);
@@ -254,20 +264,19 @@ void HttpServer :: ForkProcess()
         (void)close(i); //close open files
 
     (void)setpgrp(); //break away from process group
-     Logger(LOG, temp1,temp2, getpid());
+     Logger(LOG, "new starting",argv[1], getpid());
 
 }
 
 void HttpServer :: SetUpSocket()
 {
 
-    string s1("system call"), s2("socket"),s3("Invaild port number (try 1 -> 6000)"),s4(argv[1]);
     if((listenfd = socket(AF_INET, SOCK_STREAM,0)) < 0)
-        Logger(ERROR,s1,s2,0);
+        Logger(ERROR,"System call","socket",0);
     port = atoi(argv[1]);
 
     if( port < 0 || port > 60000)
-        Logger(ERROR, s3,s4,0);
+        Logger(ERROR, "Invaild port number(try 1 -> 60000)",argv[1],0);
 }
 
 void HttpServer :: SetUpSocketAddress()
@@ -277,22 +286,27 @@ void HttpServer :: SetUpSocketAddress()
     serv_addr.sin_port = htons(port);
 }
 
+///
+/// <summary> to establish the connection </summary>
+///
 
 void HttpServer:: EstablishConnect()
 {
-    string s1("system call"),s2("bind"),s3("listen"),s4("accept"), s5("fork");
+
     if( bind(listenfd, (sockaddr*) &serv_addr, sizeof(serv_addr)) < 0 )
-        Logger(ERROR, s1, s2,0);
+        Logger(ERROR, "system call", "bind",0);
+
     if( listen(listenfd, 64) < 0)
-        Logger(ERROR,s1, s3,0);
+        Logger(ERROR,"system call", "listen",0);
+
     for( hit = 1;;++hit){
         length = sizeof(cli_addr);
         if((socketfd = accept(listenfd, (sockaddr *) &cli_addr, &length)) < 0 )
-            Logger(ERROR,s1,s4,0);
+            Logger(ERROR,"system call","accept",0);
         if( (pid = fork()) < 0){
-            Logger(ERROR, s1,s5,0);
+            Logger(ERROR, "system call","fork",0);
         }else{
-            if( pid == 0){   // this child
+            if( pid == 0){   // child
                 (void)close(listenfd);
                 Web(socketfd,hit); //never returns
             }else{ //parent
