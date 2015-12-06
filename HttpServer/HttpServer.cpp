@@ -69,7 +69,9 @@ void Error :: ChangeDirectoryError()
 ///
 /// <summary>create a log file to store the connection message</summary>
 /// <para name = "type"> the type of hint message</para name>
-/// <para name = "s1" & "s2"><>
+/// <para name = "s1" & "s2"> the log informaton </para name>
+/// <para name = "socket_fd"> the file description</para name>
+///
 void HttpServer :: Logger(const int &type,const string s1, const string s2,int socket_fd)
 {
      int fd;
@@ -84,11 +86,11 @@ void HttpServer :: Logger(const int &type,const string s1, const string s2,int s
         case FORBIDDEN:
         //<summary>int write(int s ,char* buf,int len)</summary>
         //<return>if it successeeds, the fuction returns the number of bytes.</return>
-                    (void)write(socket_fd,Packets[403].c_str(),Packets[403].size());
+                    (void)(write(socket_fd,Packets[403].c_str(),Packets[403].size()));
                     stringStream <<  "FOBIDDEN: " + s1 + ":" + s2;
                     break;
         case NOTFOUND:
-                    (void)write(socket_fd,Packets[404].c_str(),Packets[404].size());break;
+                    (void)(write(socket_fd,Packets[404].c_str(),Packets[404].size()));
                     stringStream << "NOT FOUND: " + s1 + ":" + s2;
                     break;
         case LOG:
@@ -118,12 +120,9 @@ void HttpServer :: Web(int fd, int hit)
     const char *fstr;
     static string  buffer;
 
-    string tmp1("failed to read brower request"), tmp2("");
 
     //*{ following is to convert the string to c-style string.
 
-     char *copyBuffer = new char[buffer.length()+1];
-     strcpy(copyBuffer,buffer.c_str());
 
     //*}
 
@@ -132,16 +131,17 @@ void HttpServer :: Web(int fd, int hit)
     // <para name = "fd"> file descriptor</para name>
     // <para name = "buf"> the buffer</para name>
     // <para name = "count"> count bytes from file descriptor.</para name>
-    ret = read(fd, copyBuffer, BUFFSIZE);
+    ret = read(fd, const_cast<char*>(buffer.c_str()), BUFFSIZE);
 
     if( ret == 0 || ret == -1){ /*read failure stop now*/
-        Logger(FORBIDDEN, tmp1,tmp2,fd);
+        Logger(FORBIDDEN, "failed to read brower request","",fd);
     }
 
     if( ret > 0 && ret < BUFFSIZE) /*return code is valid chars*/
         buffer[ret] = 0;
     else
         buffer[0] = 0;
+
     for( i = 0; i < ret; ++i){
         if( buffer[i] == '\r' || buffer[i] == '\n')
             buffer[i] = '*';
@@ -205,11 +205,11 @@ void HttpServer :: Web(int fd, int hit)
     std ::ostringstream stringStream;
     stringStream << "HTTP/1.1\t200\tOK\nServer:nweb/" << VERSION <<".0\nContent-Length: " << len << "\nConnection: close\nContent-Type:" << *fstr << "\n\n";
     Logger(LOG,"Header", buffer,hit);
-    (void)write(fd, buffer.c_str(), buffer.size());
+    (void) write(fd, buffer.c_str(), buffer.size());
 
 
 
-    while( (ret = read( file_fd, copyBuffer, BUFFSIZE)) > 0 ){
+    while( (ret = read( file_fd, const_cast<char*>(buffer.c_str()), BUFFSIZE)) > 0 ){
         (void)write(fd, buffer.c_str(), ret);
     }
 
@@ -250,11 +250,11 @@ void HttpServer :: CreateSocket()
 ///
 /// <summary>become deamon + unstopable and no zombies children<summary>
 ///
-int HttpServer :: ForkProcess()
+void HttpServer :: ForkProcess()
 {
     int i;
     if(fork() != 0) //parent return OK to shell
-        return 0;
+        return ;
 
     (void)signal(SIGCHLD,SIG_IGN);//ignore child death
     (void)signal(SIGHUP, SIG_IGN);//ignore terminal hangups

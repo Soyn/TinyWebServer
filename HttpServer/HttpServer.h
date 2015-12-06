@@ -41,7 +41,7 @@ public:
     void Logger(const int&, const std :: string, const std :: string ,int);
     void InsertPacket();
     void CreateSocket();
-    int ForkProcess();
+    void ForkProcess();
     void SetUpSocket();
     void SetUpSocketAddress();
     void EstablishConnect();
