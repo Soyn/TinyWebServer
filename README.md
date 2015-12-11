@@ -1,6 +1,6 @@
 #This is a TinyWebServer
 ##<font color = "orange">Note</font>
-- This server is running on the Linux.(I write them in Ubuntu).
+- This server is running on the Linux.(I wrote them on Ubuntu).
 - Using gcc version 4.8.2 
 - Compile them separately into two executables called Server and Client, and you should run the client and server 
 on separate hosts on the internet. Start the server first.
