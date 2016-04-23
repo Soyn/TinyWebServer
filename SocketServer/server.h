@@ -33,7 +33,7 @@ public:
     // @Para name argv: argument value.
     Server(int argc, char **argv) : argc_(argc), argv_(argv),
                                         error_handler_(argc_){}
-    ~Server(){close(socket_file_description_);}
+    ~Server(){close(listen_socket_file_description_);}
 
     //
     // @Brief: Check port open or not.
@@ -60,7 +60,7 @@ public:
     void Run();
 
 private:
-    int socket_file_description_, new_socket_file_description_;
+    int listen_socket_file_description_, connect_socket_file_description_;
     int port_number_;
     int argc_;
     int pid_;

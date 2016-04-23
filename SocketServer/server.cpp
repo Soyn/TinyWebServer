@@ -19,8 +19,8 @@ void Server :: CheckPort()
 // @Brief: Create a socket for communicate with client.
 void Server :: CreateSocket()
 {
-    socket_file_description_ = socket(AF_INET, SOCK_STREAM, 0);
-    error_handler_.CheckSocketCreatedOrNot(socket_file_description_);
+    listen_socket_file_description_ = socket(AF_INET, SOCK_STREAM, 0);
+    error_handler_.CheckSocketCreatedOrNot(listen_socket_file_description_);
 }
 
 //
@@ -45,10 +45,10 @@ void Server :: SetServerAddress()
 // @Brief: Bind the socket with server.
 void Server :: BindSocketWithServer()
 {
-    int bind_flag = bind(socket_file_description_, (sockaddr*)
+    int bind_flag = bind(listen_socket_file_description_, (sockaddr*)
                         (&server_address_), sizeof(server_address_));
     error_handler_.CheckBindOrNot(bind_flag);
-    listen(socket_file_description_, 5);
+    listen(listen_socket_file_description_, 5);
 }
 
 //
@@ -59,22 +59,25 @@ void Server :: EstablishConnect()
     while(1)
     {
         //establish the connection
-        new_socket_file_description_ = accept(socket_file_description_,
+        connect_socket_file_description_ = accept(listen_socket_file_description_,
                             (sockaddr*) &client_address_, &client_length_);
-        error_handler_.CheckAcceptOrNot(new_socket_file_description_);
+        error_handler_.CheckAcceptOrNot(connect_socket_file_description_);
 
-        pid_ = fork();      //create a new process to handle this connection
+        pid_ = fork();      //create a child process to handle this connection
         if(pid_ < 0)
            error_handler_.ErrorMessageDisplay("Error on fork");
-        if(pid_ == 0)
+        if(pid_ == 0)  // in child process the pid_ equals to 0
         {
-            close(socket_file_description_);
+            // child process close the listen file description
+            close(listen_socket_file_description_);
             DisplayMessageFromClient();
+            // the child close the connect socket file description
+            close(connect_socket_file_description_);
             exit(0);  // the process exits
         }
         else
              // the parent closes the new socket file description
-            close(new_socket_file_description_);
+            close(connect_socket_file_description_);
     }
 }
 
@@ -86,11 +89,11 @@ void Server :: DisplayMessageFromClient()
     char buffer[BUFSIZE];
 
     bzero(buffer,BUFSIZE);
-    n = read(new_socket_file_description_,buffer,BUFSIZE - 1);
+    n = read(connect_socket_file_description_,buffer,BUFSIZE - 1);
     if(n < 0)
         error_handler_.ErrorMessageDisplay("ERROR reading from socket");
     std :: cout << "Here is the message: " << buffer << std :: endl;
-    n = write(new_socket_file_description_,"I get your message", 18);
+    n = write(connect_socket_file_description_,"I get your message", 18);
 
     if(n < 0)
         error_handler_.ErrorMessageDisplay("Error writing to socket");
