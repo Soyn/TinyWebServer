@@ -75,9 +75,8 @@ void Server :: EstablishConnect()
             close(connect_socket_file_description_);
             exit(0);  // the process exits
         }
-        else
-             // the parent closes the new socket file description
-            close(connect_socket_file_description_);
+        // the parent closes the new socket file description
+        close(connect_socket_file_description_);
     }
 }
 
