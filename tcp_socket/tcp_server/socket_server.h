@@ -1,8 +1,15 @@
 #ifndef SERVER_H_INCLUDED
 #define SERVER_H_INCLUDED
 
-#include "error_handler.h"
-
+/****************************************************
+* @Author: Soyn
+* @Brief: Implement the procedure to communicate with
+* client using socket.
+* @CreatedTime:25/9/15.
+* @Soyn: Refact the code(29/3/16.)
+****************************************************/
+#include "error_handler_for_server.h"
+#include "signal_handler.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -16,14 +23,6 @@
 
 #include <iostream>
 #include <string>
-
-/*********************************
-* @Author: Soyn
-* @Brief: Implement the procedure to communicate with
-* client using socket.
-* @CreatedTime:25/9/15.
-* @Soyn: Refact the code(29/3/16.)
-**********************************/
 
 class Server{
 public:
@@ -69,6 +68,8 @@ private:
     sockaddr_in server_address_, client_address_;
 
     ErrorHandler error_handler_;  // The error handler to handle error.
+
+    SignalHandler signal_handler_;
 };
 
 

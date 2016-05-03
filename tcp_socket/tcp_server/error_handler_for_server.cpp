@@ -1,12 +1,10 @@
-#include "error_handler.h"
-#include <iostream>
-
-/*******************
+/******************************************
 * @Author: Soyn
 * @Brief: The implement for error handler.
 * @CreatedTime: 29/3/16.
-********************/
-
+******************************************/
+#include "error_handler_for_server.h"
+#include <iostream>
 //
 // @Brief: The private function for error handling.
 void ErrorHandler :: Error(const char* message)
