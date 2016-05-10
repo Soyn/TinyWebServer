@@ -7,7 +7,9 @@
 * @CreatedTime: 29/3/16.
 ****************************************/
 #include <cstdio>
+#include <cstdlib>
 #include <cerrno>
+
 #include <string>
 
 class ErrorHandler{

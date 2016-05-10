@@ -34,9 +34,9 @@ public:
                                         error_handler_(argc_){}
     ~Server(){close(listen_socket_file_description_);}
 
-    //
-    // @Brief: Check port open or not.
-    void CheckPort();
+    Server(const Server&) = delete;
+    Server& operator=(const Server&) = delete;
+
     //
     // @Brief: Create a socket.
     void CreateSocket();

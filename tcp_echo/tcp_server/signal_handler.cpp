@@ -7,7 +7,7 @@
 #include "signal_handler.h"
 //
 // @Brief: The signal handler function
-SignalHandler :: SignalFunction *
+SignalFunction *
 SignalHandler :: Signal(int signo, SignalFunction *func)
 {
     struct sigaction active, old_active;
@@ -28,4 +28,14 @@ SignalHandler :: Signal(int signo, SignalFunction *func)
         return (SIG_ERR);
     }
     return (old_active.sa_handler);
+}
+
+void SignalChild(int signo)
+{
+    pid_t pid;
+    int status;
+    while((pid = waitpid(-1, &status, WNOHANG)) > 0){
+        std :: cout << "child " << pid << " terminated\n";
+    }
+    return;
 }

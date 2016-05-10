@@ -9,20 +9,23 @@
 
 #include <sys/wait.h>
 #include <sys/signal.h>
-
+#include <sys/types.h>
 #include <iostream>
-
+//
+// use typedef to simplify the signal()
+typedef void SignalFunction(int);
 class SignalHandler{
 public:
     //
-    // use typedef to simplify the signal()
-    typedef void SignalFunction(int);
-
+    SignalHandler() = default;
     //
     // To define the my own signal handler function
-    SignalFunction* Signal(int signal, SignalFunction *funcion);
-    SignalHandler();
-    ~SignalHandler();
+    SignalFunction* Signal(int signal, SignalFunction *func);
+    ~SignalHandler(){}
+
 };
 
+//
+// @Brief: the handle function
+void SignalChild(int signo);
 #endif // SIGNAL_CATCH_H_INCLUDED

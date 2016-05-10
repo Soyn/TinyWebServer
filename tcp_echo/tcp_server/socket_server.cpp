@@ -7,17 +7,12 @@
 
 #include "socket_server.h"
 #define BUFSIZE 1024
-//
-// @Brief: Check port open or not.
-void Server :: CheckPort()
-{
-    error_handler_.CheckPortOpenOrNot();
-}
 
 //
 // @Brief: Create a socket for communicate with client.
 void Server :: CreateSocket()
 {
+    error_handler_.CheckPortOpenOrNot();
     listen_socket_file_description_ = socket(AF_INET, SOCK_STREAM, 0);
     error_handler_.CheckSocketCreatedOrNot(listen_socket_file_description_);
 }
@@ -48,6 +43,7 @@ void Server :: BindSocketWithServer()
                         (&server_address_), sizeof(server_address_));
     error_handler_.CheckBindOrNot(bind_flag);
     listen(listen_socket_file_description_, 5);
+    signal_handler_.Signal(SIGCHLD, SignalChild);
 }
 
 //
@@ -90,7 +86,7 @@ void Server :: DisplayMessageFromClient()
     n = read(connect_socket_file_description_,buffer,BUFSIZE - 1);
     if(n < 0)
         error_handler_.ErrorMessageDisplay("ERROR reading from socket");
-    std :: cout << "Here is the message: " << buffer << std :: endl;
+    std :: cout << "Here is the message:\n" << buffer << std :: endl;
     n = write(connect_socket_file_description_,"I get your message", 18);
 
     if(n < 0)
@@ -102,7 +98,6 @@ void Server :: DisplayMessageFromClient()
 // @Brief: To package all the procedures.
 void Server :: Run()
 {
-    CheckPort();
     CreateSocket();
     SetServerAddress();
     BindSocketWithServer();
