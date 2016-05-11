@@ -28,7 +28,7 @@ void ClientErrorHandler :: CheckHost()
 {
     if(argument_counts_ < 3){
         std :: cerr << "Usage " << argument_values_[0]
-                    << "hostname port" << std :: endl;
+                    << " hostname port" << std :: endl;
         exit(0);
     }
 }

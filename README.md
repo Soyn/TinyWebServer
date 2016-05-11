@@ -8,8 +8,12 @@ on separate hosts on the internet. Start the server first.
     - In server terminal command line is : `./Server [port number]`
 - If any bug caught, please [let me know](https://github.com/Soyn/TinyWebServer/issues), thanks.
 
-## Socket Client
-![image](https://github.com/Soyn/TinyWebServer/blob/master/screenshots/socket_client.gif)
+# Tcp Echo Server Demo
 
-## Socket Server
-![image](https://github.com/Soyn/TinyWebServer/blob/master/screenshots/socket_server.gif)
+# Features
+  - Concurrent server
+  - Signal handler supported
+  - Error handler supported
+
+
+![image](https://github.com/Soyn/TinyWebServer/blob/master/screenshots/tcp_echo_demo.gif)

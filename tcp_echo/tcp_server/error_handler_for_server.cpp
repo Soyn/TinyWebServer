@@ -4,6 +4,7 @@
 * @CreatedTime: 29/3/16.
 ******************************************/
 #include "error_handler_for_server.h"
+#include "signal_handler.h"
 #include <iostream>
 //
 // @Brief: The private function for error handling.

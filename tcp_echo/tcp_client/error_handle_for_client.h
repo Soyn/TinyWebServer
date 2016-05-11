@@ -7,6 +7,8 @@
 * @Soyn: Refactor the code in 25/4/16.
 **/
 #include <netdb.h>
+#include <cstdio>
+#include <cstdlib>
 class ClientErrorHandler{
 public:
     ClientErrorHandler(int argument_counts, char **argument_values);
