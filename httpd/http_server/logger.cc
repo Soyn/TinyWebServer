@@ -1,6 +1,6 @@
-#include "logger.h"
+#include "logger.hpp"
 
-const int Logger :: Error = 42, Log = 44, Forbidden = 403, NotFound = 404;
+
 
 void Logger :: Logging(int type, const std :: string s1,
                 const std :: string s2, int socket_file_description)
@@ -10,13 +10,13 @@ void Logger :: Logging(int type, const std :: string s1,
         return;
 
     switch(type){
-        case Error:{
+        case ERROR:{
             logger_file_stream << "ERROR: " << s1 + ":" + s2 + " " << "Errno = "
              << errno <<" pid = " << getpid() << "\n";
              break;
         }
 
-        case Forbidden: {
+        case FORBIDDEN: {
             std :: string response_of_forbidden("HTTP/1.1 403 Forbidden\n\
 Content-Length: 185\nConnection:close\nContent-Type:text/html\n\n<html>\
 <head>\n<title>403 Forbidden</title>\n</head><body>\n<h1>Forbidden</h1>\n\
@@ -29,7 +29,7 @@ file web server\n</body></html>\n");
             break;
         }
 
-        case NotFound: {
+        case NOTFOUND: {
             std :: string response_of_not_found("HTTP/1.1 404 Not Found\n\
 Content-Length: 136\nConnection:close\nContent-Type: text/html\n\n<html>\
 <head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\n\
@@ -41,9 +41,9 @@ The request URL was not found on this server.\n</body></html>\n");
             break;
         }
 
-        case Log: {
+        case LOG: {
             logger_file_stream << "INFO: " << s1 + " : "  + s2 + " : "
-                << socket_file_description_;
+                << socket_file_description;
             break;
         }
     }

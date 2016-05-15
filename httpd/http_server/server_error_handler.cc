@@ -7,7 +7,7 @@
 
 
 
-#include "server_error_handler.h"
+#include "server_error_handler.hpp"
 
 const double ErrorHandler :: version_ = 1.1 ;
 
@@ -27,7 +27,7 @@ const SFT ErrorHandler :: supported_file_type_collections_[] = {
 
 //
 // @Brief: Check the request is valid or not.
-void ErrorHandler :: CheckRequestSupportedOrNot()
+void ErrorHandler :: CheckRequestSupportedValidOrNot()
 {
 
     std::cout << "\t\t\t\033[7m YWeb( Version "<< version_ << ")\033[m" << std :: endl;

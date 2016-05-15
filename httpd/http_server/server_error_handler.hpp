@@ -23,6 +23,7 @@ typedef struct SupportFileType{
     std :: string file_type_;
 }SFT;
 
+
 class ErrorHandler{
 public:
     ErrorHandler(int argc, char **argv) : argument_counts_(argc),
@@ -31,7 +32,7 @@ public:
 
     //
     // @Brief: For not support error
-    void CheckRequestSupportedOrNot();
+    void CheckRequestSupportedValidOrNot();
     //
     // @Brief: Check the request file's directory is valid or not
     void CheckRequestDirectoryValidOrNot();
@@ -40,9 +41,8 @@ public:
     void CheckChangeDirectoryValidOrNot();
 
     static const SFT supported_file_type_collections_[];
-
-private:
     static const double version_;
+private:
     int argument_counts_;
     char **arguments_values_;
 };

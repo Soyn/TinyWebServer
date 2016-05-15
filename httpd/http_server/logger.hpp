@@ -22,8 +22,8 @@ public:
     // @Brief: The handling procedure
     void Logging(int type, const std :: string s1, const std :: string s2,
                  int socket_file_description);
+    enum LoggerStatusCode{ERROR = 42, LOG = 44, FORBIDDEN = 403, NOTFOUND = 404};
 private:
-    static const int Error, Forbidden, NotFound, Log;
 
 };
 

@@ -8,21 +8,11 @@
 #ifndef _HTTPSERVER_H
 #define _HTTPSERVER_H
 
-#include "tcp_socket.h"
-#include "server_error_handler.h"
+#include "logger.hpp"
+#include "tcp_socket.hpp"
+#include "server_error_handler.hpp"
 
-#include <string.h>
-#include <cstdlib>
-#include <cstdio>
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <signal.h>
-#include <arpa/inet.h>
-#include <errno.h>
-#include <fcntl.h>
 
 #include <iostream>
 #include <fstream>
@@ -33,13 +23,14 @@
 #include <algorithm>
 #include <map>
 
+class TcpSocket;
 
-
-class HttpServer :: TcpSocket{
+class HttpServer : public TcpSocket{
+    friend bool IsDelimiter(const char &chr);
 public:
 
     HttpServer(int argument_counts, char **argument_values) :
-        TcpSocket(argument_counts, argument_values), argument_counts_(argument_counts_),
+        TcpSocket(argument_counts, argument_values), argument_counts_(argument_counts),
         argument_values_(argument_values),
         error_handler_(argument_counts_, argument_values_){}
 
@@ -60,21 +51,22 @@ public:
     // @Brief: Send the response to client
 
     //
-    // @Brief: the predictor function
-    inline bool IsDelimiter(const char &chr);
-    //
     // @Brief: Handle the request from client
     // @Para name = "connected_file_description": the connected file
     // description returned from accept()
     void HandleRequest(const int connected_socket_file_description,
                         int hit);
-
+    //
+    // @Brief: Send response to client
     void SendResponse();
+
+    //
+    // @Brief: Run the server
+    void Run();
 
 private:
 
-    static const int BufferSize, Error, Forbidden, NotFound, Log;
-
+    static const int BufferSize;
     int argument_counts_;
     char **argument_values_;
 
@@ -82,4 +74,6 @@ private:
     Logger logger_;
 
 };
+
+
 #endif
