@@ -25,7 +25,7 @@
 
 class TcpSocket;
 
-class HttpServer : public TcpSocket{
+class HttpServer:public TcpSocket{
     friend bool IsDelimiter(const char &chr);
 public:
 
@@ -46,16 +46,12 @@ public:
 
     //
     // @Brief: Get the request from client
-    void GetRequest();
-    //
-    // @Brief: Send the response to client
-
+    void GetRequest(const int& connected_socket_file_descriptor, int hit);
     //
     // @Brief: Handle the request from client
     // @Para name = "connected_file_description": the connected file
     // description returned from accept()
-    void HandleRequest(const int connected_socket_file_description,
-                        int hit);
+    void HandleRequest(const int& connected_socket_file_descriptor,int hit);
     //
     // @Brief: Send response to client
     void SendResponse();
@@ -72,7 +68,24 @@ private:
 
     ErrorHandler error_handler_;
     Logger logger_;
+    //
+    // @Brief: buffer for socket descriptor
+    std::string buffer_;
+    std::string request_file_type_;
+    int length_of_request_file_;
 
+    //
+    //@Brief: Get http head information
+    void GetHttpHeadInfo(const int& connected_socket_file_descriptor,
+                        const int& hit);
+
+    //
+    // @Brief: Send http head info
+    void SendHttpHead(const int& connected_socket_file_descriptor);
+
+    //
+    // @Brief: Send request file to client
+    void SendRequestFile(const int& connected_socket_file_descriptor);
 };
 
 

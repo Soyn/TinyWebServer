@@ -32,8 +32,8 @@ public:
     int argument_counts_;
     char **argument_values_;
 
-    int port_number_, listen_socket_file_description_,
-    connected_socket_file_description_;
+    int port_number_, listen_socket_file_descriptor_,
+    connected_socket_file_descriptor_;
 
     socklen_t length;
     sockaddr_in client_address_, server_address_;

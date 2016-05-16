@@ -19,8 +19,8 @@
 
 
 typedef struct SupportFileType{
-    std :: string file_extension_;
-    std :: string file_type_;
+    std::string file_extension_;
+    std::string file_type_;
 }SFT;
 
 
