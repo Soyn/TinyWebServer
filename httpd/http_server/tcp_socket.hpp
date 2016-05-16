@@ -26,6 +26,10 @@ class TcpSocket{
 public:
     TcpSocket(int argument_counts, char **argument_values) :
         argument_counts_(argument_counts), argument_values_(argument_values){}
+
+    TcpSocket(const TcpSocket&) = delete;
+    TcpSocket& operator=(const TcpSocket&) = delete;
+
     ~TcpSocket(){}
     void CreateSocket();
 public:

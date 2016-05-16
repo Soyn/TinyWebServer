@@ -33,7 +33,8 @@ public:
         TcpSocket(argument_counts, argument_values), argument_counts_(argument_counts),
         argument_values_(argument_values),
         error_handler_(argument_counts_, argument_values_){}
-
+    HttpServer(const HttpServer&) = delete;
+    HttpServer& operator=(const HttpServer&) = delete;
     ~HttpServer(){}
 
     //

@@ -1,6 +1,9 @@
+/*********************************
+* @Author: Soyn
+* @Brief: The implementation of logger
+* @CreatedTime: 30/4/16
+*********************************/
 #include "logger.hpp"
-
-
 
 void Logger::Logging(int type, const std :: string s1,
                 const std::string s2, int socket_file_descriptor)
