@@ -19,7 +19,7 @@ public:
     //
     // @Brief: Create the client socket
     void CreateClientSocket();
-    void CheckSocketCreatedOrNot(const int &socket_file_description);
+    void CheckSocketCreatedOrNot(const int &socket_file_descriptor);
     //
     // @Brief: Check the connection
     void CheckConnection(const int &connection_status);

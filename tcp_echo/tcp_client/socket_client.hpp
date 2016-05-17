@@ -6,7 +6,8 @@
 * @CreatedTime: 15/09/15
 * @Soyn: Refactor the code in 25/4/16
 ***********************************************/
-#include "error_handle_for_client.h"
+#include "error_handler_for_client.hpp"
+
 #include <cstdio>
 #include <cstdlib>
 #include <string.h>
@@ -16,6 +17,9 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <cerrno>
+#include <sys/select.h>
+#include <sys/time.h>
+
 
 #include <iostream>
 #include <string>
@@ -53,12 +57,15 @@ public:
     // Wrap all the procedure together
     void Run();
 private:
-    int client_socket_file_description_, server_port_number_,
+    int client_socket_file_descriptor_, server_port_number_,
     argument_counts_;
     sockaddr_in server_address_;
     hostent *server_host_entry_;
     char buffer[BUFFERSIZE], **argument_values_;
     ClientErrorHandler error_handler_;
+
+    int maximum_file_descriptor_;
+    fd_set read_set_;
 private:
 };
 
