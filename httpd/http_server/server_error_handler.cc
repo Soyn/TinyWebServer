@@ -27,11 +27,12 @@ const SFT ErrorHandler::supported_file_type_collections_[] = {
 
 //
 // @Brief: Check the request is valid or not.
-void ErrorHandler::CheckRequestSupportedValidOrNot()
+void ErrorHandler::CheckRequestSupportedOrNot()
 {
 
     std::cout << "\t\t\t\033[7m YWeb( Version "<< version_ << ")\033[m" << std::endl;
-    if(argument_counts_ != 3 || !strcmp(arguments_values_[1], "-?")){
+    if((argument_counts_ != 3 ||
+        !strcmp(arguments_values_[1], "-?"))){
         std::cout << "====================================================\
 ===================" << std::endl;
         std::cout << "\tHint: Port-Number Top-Directory\t\t" <<
@@ -51,9 +52,10 @@ void ErrorHandler::CheckRequestSupportedValidOrNot()
         << "/tmp, /usr, /dev, /sbin\n\n\tNo warranty given or implied\n" << std::endl;
         std::cout << "====================================================\
 ===================" << std::endl;
+        exit(0);
     }
 
-    exit(0);
+
 }
 
 //
@@ -63,13 +65,14 @@ void ErrorHandler::CheckRequestDirectoryValidOrNot()
     std::vector<std::string> not_supported_directories{
         "/", "/etc", "/bin", "lib", "/tmp", "usr", "/dev", "sbin"
     };
-
+    std::cout << arguments_values_[2] << std::endl;
     for(const auto directory : not_supported_directories){
         if(directory.compare(arguments_values_[2]) == 0){
             std::cout << "ERROR: Bad top directory ==> " <<
             arguments_values_[2] << std::endl;
+            exit(3);
         }
-        exit(3);
+
     }
 }
 

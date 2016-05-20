@@ -12,5 +12,6 @@
 #include "../tcp_socket.hpp"
 
 void TestForLogger();
+void TestForErrorHandler();
 
 #endif // TEST_CASES_HEADER_HPP_INCLUDED

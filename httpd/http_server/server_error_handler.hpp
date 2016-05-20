@@ -26,13 +26,15 @@ typedef struct SupportFileType{
 
 class ErrorHandler{
 public:
-    ErrorHandler(int argc, char **argv) : argument_counts_(argc),
+    ErrorHandler():argument_counts_(1), arguments_values_(nullptr){}
+    ErrorHandler(int argc, char **argv):argument_counts_(argc),
                                         arguments_values_(argv){ }
+
     ~ErrorHandler(){}
 
     //
     // @Brief: For not support error
-    void CheckRequestSupportedValidOrNot();
+    void CheckRequestSupportedOrNot();
     //
     // @Brief: Check the request file's directory is valid or not
     void CheckRequestDirectoryValidOrNot();

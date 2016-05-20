@@ -29,7 +29,7 @@ void HttpServer::OpenServer()
 // @Brief: Initialize the server including checking the error
 void HttpServer::InitializeServer()
 {
-    error_handler_.CheckRequestSupportedValidOrNot();
+    error_handler_.CheckRequestSupportedOrNot();
     error_handler_.CheckRequestDirectoryValidOrNot();
     error_handler_.CheckChangeDirectoryValidOrNot();
     CreateSocket();
