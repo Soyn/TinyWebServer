@@ -5,7 +5,7 @@
 * @Refactor: By Soyn 3/5/16
 *********************************************/
 
-#include "socket_server.h"
+#include "socket_server.hpp"
 #define BUFSIZE 1024
 
 //
@@ -42,7 +42,7 @@ void Server :: BindSocketWithServer()
     int bind_flag = bind(listen_socket_file_description_, (sockaddr*)
                         (&server_address_), sizeof(server_address_));
     error_handler_.CheckBindOrNot(bind_flag);
-    listen(listen_socket_file_description_, 5);
+    listen(listen_socket_file_description_, 64);
     signal_handler_.Signal(SIGCHLD, SignalChild);
 }
 
