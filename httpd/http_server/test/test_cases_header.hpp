@@ -13,5 +13,7 @@
 
 void TestForLogger();
 void TestForErrorHandler();
+void TestForTcpSocket(int argc, char **argv);
+void TestForHttpSerever();
 
 #endif // TEST_CASES_HEADER_HPP_INCLUDED

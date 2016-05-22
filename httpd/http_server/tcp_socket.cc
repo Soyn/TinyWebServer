@@ -12,13 +12,13 @@ void TcpSocket::CreateSocket()
 {
     bzero(&server_address_, sizeof(server_address_));
     port_number_ = atoi(argument_values_[1]);
-
     if(port_number_ < 0 || port_number_ > 60000){
+
         logger_.Logging(Logger::ERROR, "Invalid port number (try 1~60000)",
                         argument_values_[1], 0);
     }
 
-    listen_socket_file_descriptor_ = socket(AF_INET, SOCK_DGRAM, 0);
+    listen_socket_file_descriptor_ = socket(AF_INET, SOCK_STREAM, 0);
 
     if(listen_socket_file_descriptor_ < 0){
         logger_.Logging(Logger::ERROR, "System call", "socket", 0);
@@ -40,5 +40,15 @@ void TcpSocket::CreateSocket()
     if(listen_flag < 0){
         logger_.Logging(Logger::ERROR, "System call", "listen", 0);
     }
+
+    client_length_ = sizeof(client_address_);
+    accept(listen_socket_file_descriptor_, (struct sockaddr*) &client_address_,
+           &client_length_);
 }
 
+//
+// @Brief: Get the port number
+int TcpSocket::GetPortNumber() const
+{
+    return port_number_;
+}

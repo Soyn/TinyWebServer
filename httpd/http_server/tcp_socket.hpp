@@ -32,6 +32,7 @@ public:
 
     ~TcpSocket(){}
     void CreateSocket();
+    int GetPortNumber() const;
 public:
     int argument_counts_;
     char **argument_values_;
@@ -39,7 +40,7 @@ public:
     int port_number_, listen_socket_file_descriptor_,
     connected_socket_file_descriptor_;
 
-    socklen_t length;
+    socklen_t client_length_;
     sockaddr_in client_address_, server_address_;
 
     Logger logger_;
