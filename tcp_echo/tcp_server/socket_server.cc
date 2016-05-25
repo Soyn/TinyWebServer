@@ -6,15 +6,14 @@
 *********************************************/
 
 #include "socket_server.hpp"
-#define BUFSIZE 1024
 
 //
 // @Brief: Create a socket for communicate with client.
 void Server :: CreateSocket()
 {
     error_handler_.CheckPortOpenOrNot();
-    listen_socket_file_description_ = socket(AF_INET, SOCK_STREAM, 0);
-    error_handler_.CheckSocketCreatedOrNot(listen_socket_file_description_);
+    listen_socket_file_descriptor_ = socket(AF_INET, SOCK_STREAM, 0);
+    error_handler_.CheckSocketCreatedOrNot(listen_socket_file_descriptor_);
 }
 
 //
@@ -23,7 +22,7 @@ void Server :: SetServerAddress()
 {
     bzero((char*)&server_address_, sizeof(server_address_));
     // convert the port number from string of digits to an integer.
-    port_number_ = atoi(argv_[1]);
+    port_number_ = atoi(argument_values_[1]);
 
      // must be AF_INET which contain a code for the address family.
     server_address_.sin_family = AF_INET;
@@ -39,61 +38,112 @@ void Server :: SetServerAddress()
 // @Brief: Bind the socket with server.
 void Server :: BindSocketWithServer()
 {
-    int bind_flag = bind(listen_socket_file_description_, (sockaddr*)
+    int bind_flag = bind(listen_socket_file_descriptor_, (sockaddr*)
                         (&server_address_), sizeof(server_address_));
     error_handler_.CheckBindOrNot(bind_flag);
-    listen(listen_socket_file_description_, 64);
+    listen(listen_socket_file_descriptor_, 64);
+    InitClientConnection();
     signal_handler_.Signal(SIGCHLD, SignalChild);
 }
 
 //
 // @Brief: Establish connect with client.
-void Server :: EstablishConnect()
+// @Note: Single process handle connection using select()
+void Server :: EstablishConnection()
 {
     client_length_ = sizeof(client_address_);
     while(1)
     {
-        //establish the connection
-        connect_socket_file_description_ = accept(listen_socket_file_description_,
-                            (sockaddr*) &client_address_, &client_length_);
-        error_handler_.CheckAcceptOrNot(connect_socket_file_description_);
+        ReadForSelect();  // get ready for the connection
+        for(auto i = 0; i < max_index_of_client_array_; ++i){  // check all clients for data
+            if((socket_file_descriptor_ = client_[i]) < 0){
+                continue;
+            }
 
-        pid_ = fork();      //create a child process to handle this connection
-        if(pid_ < 0)
-           error_handler_.ErrorMessageDisplay("Error on fork");
-        if(pid_ == 0)  // in child process the pid_ equals to 0
-        {
-            // child process close the listen file description
-            close(listen_socket_file_description_);
-            DisplayMessageFromClient();
-            // the child close the connect socket file description
-            close(connect_socket_file_description_);
-            exit(0);  // the process exits
+            if(FD_ISSET(socket_file_descriptor_, &read_set_)){
+                DisplayMessageFromClient(i);
+            }
+            if(--number_ready_ <= 0)
+                break;
         }
-        // the parent closes the new socket file description
-        close(connect_socket_file_description_);
     }
 }
 
 //
 // @Brief: Read and write message, and display the message.
-void Server :: DisplayMessageFromClient()
+void Server :: DisplayMessageFromClient(size_t index)
 {
-    int n;
-    char buffer[BUFSIZE];
+    int number_bytes;
+    char buffer[Server::BUFSIZE];
 
-    bzero(buffer,BUFSIZE);
-    n = read(connect_socket_file_description_,buffer,BUFSIZE - 1);
-    if(n < 0)
-        error_handler_.ErrorMessageDisplay("ERROR reading from socket");
-    std :: cout << "Here is the message:\n" << buffer << std :: endl;
-    n = write(connect_socket_file_description_,"I get your message", 18);
-
-    if(n < 0)
-        error_handler_.ErrorMessageDisplay("Error writing to socket");
+    bzero(buffer,Server::BUFSIZE);
+    number_bytes = read(socket_file_descriptor_,buffer,Server::BUFSIZE - 1);
+    std::cout << buffer << std::endl;
+    if(number_bytes == 0){  // connection closed by client
+        close(socket_file_descriptor_);
+        FD_CLR(socket_file_descriptor_, &all_set_);
+        client_[index] = -1;
+    }else{
+        std :: cout << "Here is the message:\n" << buffer << std :: endl;
+        write(socket_file_descriptor_, buffer, Server::MAXLINE);
+    }
 }
 
+//
+// @Brief: initialize the client connection array
+// @Note: private method
+void Server::InitClientConnection()
+{
+    maximum_file_descriptor_ = listen_socket_file_descriptor_;
+    max_index_of_client_array_ = -1;  // no connection at begin
 
+    // assign -1 to each element in client array,
+    // implies there is no connection client
+    for(auto i = 0; i < FD_SETSIZE; ++i){
+        client_[i] = -1;
+    }
+    FD_ZERO(&all_set_);
+    FD_SET(listen_socket_file_descriptor_, &all_set_);
+}
+
+//
+// @Brief: Ready for select() call
+void Server::ReadForSelect()
+{
+    int i;
+    read_set_ = all_set_;
+    number_ready_ = select(maximum_file_descriptor_ + 1, &read_set_,
+                            nullptr, nullptr, nullptr);
+    if(FD_ISSET(listen_socket_file_descriptor_, &read_set_)){  // new client connection
+        connect_socket_file_descriptor_ = accept(
+            listen_socket_file_descriptor_, (struct sockaddr*)
+                &client_address_, &client_length_);
+        // set first position which is negative
+        for(i = 0; i < FD_SETSIZE; ++i){
+            if(client_[i] < 0){
+                client_[i] = connect_socket_file_descriptor_;
+                break;
+            }
+        }
+
+        if(i == FD_SETSIZE){
+            error_handler_.ErrorMessageDisplay("too many clients");
+        }
+        FD_SET(connect_socket_file_descriptor_, &all_set_);
+
+        if(connect_socket_file_descriptor_ > maximum_file_descriptor_){
+            // for select
+            maximum_file_descriptor_ = connect_socket_file_descriptor_;
+        }
+
+        if(i > max_index_of_client_array_){
+            max_index_of_client_array_ = i;
+        }
+
+        if(--number_ready_ <= 0)  // no more readable descriptor
+            continue_or_not_ = true;
+    }
+}
 //
 // @Brief: To package all the procedures.
 void Server :: Run()
@@ -101,5 +151,5 @@ void Server :: Run()
     CreateSocket();
     SetServerAddress();
     BindSocketWithServer();
-    EstablishConnect();
+    EstablishConnection();
 }
