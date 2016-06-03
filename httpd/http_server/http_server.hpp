@@ -41,9 +41,7 @@ public:
     // @Brief: Open the server for connection
     void OpenServer();
 
-    //
-    // @Brief: Initialize the server
-    void InitializeServer();
+
 
     //
     // @Brief: Get the request from client
@@ -64,7 +62,7 @@ public:
 private:
 
     static const int BufferSize;
-    int argument_counts_;
+    int argument_counts_, length_of_request_file_;
     char **argument_values_;
 
     ErrorHandler error_handler_;
@@ -73,7 +71,10 @@ private:
     // @Brief: buffer for socket descriptor
     std::string buffer_;
     std::string request_file_type_;
-    int length_of_request_file_;
+private:
+    //
+    // @Brief: Initialize the server
+    void InitializeServer();
 
     //
     //@Brief: Get http head information

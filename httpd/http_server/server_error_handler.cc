@@ -63,7 +63,8 @@ void ErrorHandler::CheckRequestSupportedOrNot()
 void ErrorHandler::CheckRequestDirectoryValidOrNot()
 {
     std::vector<std::string> not_supported_directories{
-        "/", "/etc", "/bin", "lib", "/tmp", "usr", "/dev", "sbin"
+        "/", "/etc", "/bin", "/lib", "/tmp", "usr", "/dev", "/sbin",
+        "/etc/", "/bin/", "/lib/", "/tmp/", "/usr/", "/dev/", "/sbin/"
     };
     std::cout << arguments_values_[2] << std::endl;
     for(const auto directory : not_supported_directories){

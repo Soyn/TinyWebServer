@@ -81,7 +81,8 @@ The request URL was not found on this server.\n</body></html>\n");
         }
     }
     logger_file_stream.close();
-    //exit(3);
+    if(type == ERROR || type == NOTFOUND || type == FORBIDDEN)
+        exit(3);
 }
 
 void Logger::CleanLog()

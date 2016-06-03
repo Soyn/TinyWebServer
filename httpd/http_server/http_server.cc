@@ -153,6 +153,7 @@ void HttpServer::SendRequestFile(const int& connected_socket_file_descriptor)
 void HttpServer::SendResponse()
 {
     int connected_socket_file_descriptor;
+    int pid;
     for(int hit = 1; ; ++hit){
         socklen_t connected_client_length = sizeof(client_address_);
         if((connected_socket_file_descriptor = accept(
@@ -160,7 +161,7 @@ void HttpServer::SendResponse()
             &connected_client_length)) < 0){
             logger_.Logging(Logger::ERROR, "system call", "accept", 0);
             }
-            if(int pid = fork() < 0){
+            if((pid = fork()) < 0){
                 logger_.Logging(Logger::ERROR, "system call", "fork", 0);
             }else{
                 if(pid == 0){
@@ -191,7 +192,6 @@ void HttpServer::SendResponse()
 void HttpServer::Run()
 {
     OpenServer();
-    InitializeServer();
     SendResponse();
 }
 
