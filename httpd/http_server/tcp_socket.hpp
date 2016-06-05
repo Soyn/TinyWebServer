@@ -30,7 +30,7 @@ public:
     TcpSocket(const TcpSocket&) = delete;
     TcpSocket& operator=(const TcpSocket&) = delete;
 
-    ~TcpSocket(){}
+    virtual ~TcpSocket(){}
     void CreateSocket();
     int GetPortNumber() const;
 public:

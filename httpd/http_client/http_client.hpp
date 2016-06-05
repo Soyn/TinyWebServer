@@ -1,11 +1,11 @@
-#ifndef HTTPCLIENT_H_INCLUDED
-#define HTTPCLIENT_H_INCLUDED
-/*
+#ifndef HTTPCLIENT_HPP_INCLUDED
+#define HTTPCLIENT_HPP_INCLUDED
+/***********************************************
 * FileName: HttpClient.cpp
 * Author: Soyn
 * @Brief: The simple client using http protocol.
 * Created Time: 23/11/15
-*/
+************************************************/
 
 #include <iostream>
 #include <stdio.h>
@@ -20,7 +20,7 @@
 
 
 #define PORT 8181
-#define IP_ADDRESS "192.168.0.146"
+#define IP_ADDRESS "192.168.0.95"
 #define BUFSIZE 8196
 
 
@@ -46,5 +46,5 @@ private:
 };
 
 
-#endif // HTTPCLIENT_H_INCLUDED
+#endif // HTTPCLIENT_HPP_INCLUDED
 

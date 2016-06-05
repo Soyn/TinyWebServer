@@ -1,4 +1,4 @@
-#include "HttpClient.h"
+#include "http_client.hpp"
 
 std :: string command("GET/index.html HTTP/1.0 \r\n\r\n");
 
@@ -24,8 +24,9 @@ void HttpClient :: pexit(const std :: string& str)
 
 void HttpClient :: WelcomeSocket()
 {
-    std :: cout << "client trying to connect to " << IP_ADDRESS << " and port " << PORT << std :: endl;
-    if((socketfd = socket(AF_INET, SOCK_STREAM,0)) < 0){
+    std :: cout << "client trying to connect to " << IP_ADDRESS
+        << " and port " << PORT << std :: endl;
+    if((socketfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
         pexit("socket() failed");
     }
 }
@@ -47,17 +48,20 @@ void HttpClient :: Connect()
         pexit("connect failed");
     }
 
-    std :: cout <<  "Send bytes = " << command.length() << command << std :: endl;
+    std :: cout <<  "Send bytes = " << command.length() << " " << command << std :: endl;
 }
 
 void HttpClient :: WriteSocket()
 {
     int i;
     write(socketfd, command.c_str(), command.length());
-
+    std::cout << "I'm in\n";
     while(( i = read(socketfd,(void*) buffer.c_str(), BUFSIZE))){
-        write(1,buffer.c_str(),i);
+        std::cout << "I'm in while\n";
+        //write(1,buffer.c_str(),i);
+        std::cout << buffer << std::endl;
     }
+    std::cout << "return\n";
 }
 
 void HttpClient :: RunClient()
