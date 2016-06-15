@@ -8,7 +8,7 @@
 //
 // @Brief: The signal handler function
 SignalFunction *
-SignalHandler :: Signal(int signo, SignalFunction *func)
+SignalHandler::Signal(int signo, SignalFunction *func)
 {
     struct sigaction active, old_active;
     active.sa_handler = func;

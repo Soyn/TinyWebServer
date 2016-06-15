@@ -9,7 +9,7 @@
 
 //
 // @Brief: Create a socket for communicate with client.
-void Server :: CreateSocket()
+void Server::CreateSocket()
 {
     error_handler_.CheckPortOpenOrNot();
     listen_socket_file_descriptor_ = socket(AF_INET, SOCK_STREAM, 0);
@@ -18,7 +18,7 @@ void Server :: CreateSocket()
 
 //
 // @Brief: Set the server address, port number
-void Server :: SetServerAddress()
+void Server::SetServerAddress()
 {
     bzero((char*)&server_address_, sizeof(server_address_));
     // convert the port number from string of digits to an integer.
@@ -36,7 +36,7 @@ void Server :: SetServerAddress()
 
 //
 // @Brief: Bind the socket with server.
-void Server :: BindSocketWithServer()
+void Server::BindSocketWithServer()
 {
     int bind_flag = bind(listen_socket_file_descriptor_, (sockaddr*)
                         (&server_address_), sizeof(server_address_));
@@ -49,7 +49,7 @@ void Server :: BindSocketWithServer()
 //
 // @Brief: Establish connect with client.
 // @Note: Single process handle connection using select()
-void Server :: EstablishConnection()
+void Server::EstablishConnection()
 {
     client_length_ = sizeof(client_address_);
     while(1)
@@ -71,7 +71,7 @@ void Server :: EstablishConnection()
 
 //
 // @Brief: Read and write message, and display the message.
-void Server :: DisplayMessageFromClient(size_t index)
+void Server::DisplayMessageFromClient(size_t index)
 {
     int number_bytes;
     char buffer[Server::BUFSIZE];
@@ -84,7 +84,7 @@ void Server :: DisplayMessageFromClient(size_t index)
         FD_CLR(socket_file_descriptor_, &all_set_);
         client_[index] = -1;
     }else{
-        std :: cout << "Here is the message:\n" << buffer << std :: endl;
+        std::cout << "Here is the message:\n" << buffer << std::endl;
         write(socket_file_descriptor_, buffer, Server::MAXLINE);
     }
 }
