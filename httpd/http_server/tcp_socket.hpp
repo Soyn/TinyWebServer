@@ -33,7 +33,9 @@ public:
     virtual ~TcpSocket(){}
     void CreateSocket();
     int GetPortNumber() const;
-public:
+    void ReadyWorkForCreateSocket();
+
+protected:  // for derived class accesses
     int argument_counts_;
     char **argument_values_;
 
