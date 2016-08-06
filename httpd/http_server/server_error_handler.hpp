@@ -15,15 +15,10 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <map>
 
 
-
-typedef struct SupportFileType{
-    std::string file_extension_;
-    std::string file_type_;
-}SFT;
-
-
+extern std::map<std::string, std::string> SupportFileType;
 class ErrorHandler{
 public:
     ErrorHandler():argument_counts_(1), arguments_values_(nullptr){}
@@ -42,7 +37,7 @@ public:
     // @Brief: Check the change directory action is valid or not.
     void CheckChangeDirectoryValidOrNot();
 
-    static const SFT supported_file_type_collections_[];
+
     static const double version_;
 private:
     int argument_counts_;

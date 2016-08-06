@@ -33,6 +33,7 @@ public:
         TcpSocket(argument_counts, argument_values), argument_counts_(argument_counts),
         argument_values_(argument_values),
         error_handler_(argument_counts_, argument_values_){}
+
     HttpServer(const HttpServer&) = delete;
     HttpServer& operator=(const HttpServer&) = delete;
     ~HttpServer(){}
@@ -40,9 +41,6 @@ public:
     //
     // @Brief: Open the server for connection
     void OpenServer();
-
-
-
     //
     // @Brief: Get the request from client
     void GetRequest(const int& connected_socket_file_descriptor, int hit);
@@ -61,7 +59,7 @@ public:
 
 private:
 
-    static const int BufferSize;
+    static const int BUFFERSIZE;
     int argument_counts_, length_of_request_file_;
     char **argument_values_;
 
@@ -71,6 +69,7 @@ private:
     // @Brief: buffer for socket descriptor
     std::string buffer_;
     std::string request_file_type_;
+    std::string request_resource_file_name_;
 private:
     //
     // @Brief: Initialize the server
@@ -88,6 +87,11 @@ private:
     //
     // @Brief: Send request file to client
     void SendRequestFile(const int& connected_socket_file_descriptor);
+
+    //
+    // @Brief: Get the request resource file name
+    void GetTheRequestFileName();
+
 };
 
 

@@ -25,6 +25,7 @@ public:
     void CleanLog();
     enum LoggerStatusCode{ERROR = 42, LOG = 44, FORBIDDEN = 403, NOTFOUND = 404};
 private:
+
     // @Brief: Get current time
     void GetCurrentTime();
     int year_, month_, day_, hour_, minute_, second_;

@@ -11,7 +11,7 @@
 
 const double ErrorHandler::version_ = 1.1 ;
 
-const SFT ErrorHandler::supported_file_type_collections_[] = {
+std::map<std::string, std::string>SupportFileType = {
     { "gif", "image/gif"},
     { "jpg", "image/jpg"},
     { "jpeg", "image/jpeg"},
@@ -21,8 +21,7 @@ const SFT ErrorHandler::supported_file_type_collections_[] = {
     { "gz", "image/gz"},
     { "tar", "image/tar"},
     { "htm", "text/html"},
-    { "html", "image/html"},
-    { "0", "0"}
+    { "html", "text/html"}
 };
 
 //
@@ -41,11 +40,12 @@ void ErrorHandler::CheckRequestSupportedOrNot()
          << "and only from the named directory or its sub-directory.\n\t" <<
          "There is no fancy features\n\n\t" <<
          "Example: ./YWeb 8181 /home/Ywebdir\n\n\tOnly Supports: \n\n\t";
-        for(size_t i = 0; ErrorHandler ::
-            supported_file_type_collections_[i].file_extension_ != "0"; ++i){
-                std::cout <<
-                supported_file_type_collections_[i].file_extension_ << " ";
-            }
+
+         for(auto iter = SupportFileType.begin(); iter !=
+            SupportFileType.end(); ++iter){
+            std::cout << iter->first << " ";
+         }
+
         std::cout << "\n";
         std::cout << "\n\tNot Supported: URLs including\"...\",Java, "
         << "Javascript, CGI\n\n\tNot Support directories: / /etc, /bin, /lib,"

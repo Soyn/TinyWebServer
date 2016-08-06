@@ -49,7 +49,7 @@ void Logger::Logging(int type, const std :: string s1,
 Content-Length: 185\nConnection:close\nContent-Type:text/html\n\n<html>\
 <head>\n<title>403 Forbidden</title>\n</head><body>\n<h1>Forbidden</h1>\n\
 The request URL, file type or operation is not allowed on this simple static\
-file web server\n</body></html>\n");
+file web server(I am cute huahua.)\n</body></html>\n");
             write(socket_file_descriptor, response_of_forbidden.c_str(),
                   response_of_forbidden.length() + 1);
             logger_file_stream << "FORBIDDEN " << s1 + ":" + s2 << " " <<
@@ -74,7 +74,7 @@ The request URL was not found on this server.\n</body></html>\n");
 
         case LOG: {
             logger_file_stream << "INFO: " << s1 + " : "  + s2 + " : "
-                << socket_file_descriptor << " " << year_ << "/" << month_
+                << " " << year_ << "/" << month_
              << "/" << day_ << " " << hour_ << ":" << minute_ << ":" << second_
              << "\n";;
             break;

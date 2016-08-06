@@ -8,7 +8,7 @@
 #include "http_server.hpp"
 #include <iostream>
 
-const int HttpServer::BufferSize = 8096;
+const int HttpServer::BUFFERSIZE = 8096;
 //
 // @Brief: the predictor function
 bool IsDelimiter(const char &chr)
@@ -40,25 +40,31 @@ void HttpServer::InitializeServer()
 void HttpServer::GetRequest(const int& connected_socket_file_descriptor,
                             int hit)
 {
+    char copy_of_buffer[BUFFERSIZE];
     auto bytes_counts_from_socket = read(connected_socket_file_descriptor,
-                    const_cast<char*>(buffer_.c_str()), BufferSize);
+                    copy_of_buffer, BUFFERSIZE);
+    buffer_ = copy_of_buffer;
+
+    std::replace_if(buffer_.begin(), buffer_.end(), IsDelimiter, '*');
+
+    logger_.Logging(Logger::LOG, "request: ", buffer_, hit);
     if((bytes_counts_from_socket == 0) || (bytes_counts_from_socket == -1)){
         logger_.Logging(Logger::FORBIDDEN, "failed to read browser request",
                         " ", connected_socket_file_descriptor);
     }
 
-    if(bytes_counts_from_socket < -1 || bytes_counts_from_socket > BufferSize){
+    if(bytes_counts_from_socket < -1 || bytes_counts_from_socket > BUFFERSIZE){
         buffer_.clear();
     }
-    std::replace_if(buffer_.begin(), buffer_.end(),IsDelimiter,'*');
-    logger_.Logging(Logger::LOG, "Request", buffer_, hit);
+
 }
 //
 // @Brief: Handle the request from client
 void HttpServer::HandleRequest(const int& connected_socket_file_descriptor,int hit)
 {
     std::string http_method = buffer_.substr(0, 3);
-    if(http_method == "GET" || http_method == "get"){
+
+    if(http_method == "GET" && http_method == "get"){
         logger_.Logging(Logger::FORBIDDEN, "Only Simple GET operation supported", buffer_,
                         connected_socket_file_descriptor);
     }
@@ -69,48 +75,61 @@ void HttpServer::HandleRequest(const int& connected_socket_file_descriptor,int h
 supported", buffer_, connected_socket_file_descriptor);
     }
 
-    http_method = buffer_.substr(0, 5);
-    if(http_method == "Get /" || http_method == "get /"){
+    std::string request_URL = buffer_.substr(0, 5);
+    if(request_URL == "GET /" || request_URL == "get /"){
         buffer_.replace(0, 5, "GET /index.html");
     }
 
     bool supported_file_type = false;
+    GetTheRequestFileName();
 
-    for(int i = 0; ErrorHandler::
-        supported_file_type_collections_[i].file_extension_ != "0"; ++i){
-        if(buffer_.find(ErrorHandler::
-                    supported_file_type_collections_[i].file_extension_) !=
-           std::string::npos){
-
-            supported_file_type = true;
-
-            request_file_type_ =
-                ErrorHandler::
-                    supported_file_type_collections_[i].file_extension_;
-        }
+    auto iter = SupportFileType.find(request_file_type_);
+    if(iter != SupportFileType.end()){
+        supported_file_type = true;
     }
-
     if(!supported_file_type){
         logger_.Logging(Logger::FORBIDDEN, "file extension type not supported", buffer_,
                         connected_socket_file_descriptor);
     }
+    request_file_type_ = SupportFileType[request_file_type_];
 }
 
+//
+// @Brief: Get the resource file name
+// @Note: Private method
+void HttpServer::GetTheRequestFileName()
+{
+    int i = 4;
+    while(i < buffer_.size() && buffer_[i] != ' '){
+        ++i;
+    }
+    request_resource_file_name_ = buffer_.substr(5, i - 5);
+    for(i = 0; i < request_resource_file_name_.size() ; ++i){
+        if(request_resource_file_name_[i] == '.'){
+            break;
+        }
+    }
+
+    request_file_type_ = request_resource_file_name_.substr(i + 1, std::string::npos);
+}
+//
 //
 // @Brief: Get the http head information
 // @Note: Private member method
 void HttpServer::GetHttpHeadInfo(const int& connected_socket_file_descriptor,
                              const int& hit)
 {
-    std::ifstream request_file_stream(buffer_.substr(5));
+
+    std::ifstream request_file_stream(request_resource_file_name_);
+
     auto start_position_of_file = request_file_stream.tellg();
 
     if(!request_file_stream.is_open()){
         logger_.Logging(Logger::NOTFOUND, "failed to open file",
-        buffer_.substr(5),connected_socket_file_descriptor);
+        request_resource_file_name_,connected_socket_file_descriptor);
         }
 
-        logger_.Logging(Logger::LOG, "SEND", buffer_.substr(5),
+        logger_.Logging(Logger::LOG, "SEND", request_resource_file_name_,
                         hit);
         request_file_stream.seekg(0, request_file_stream.end);
         auto end_position_of_file = request_file_stream.tellg();
@@ -124,12 +143,18 @@ void HttpServer::GetHttpHeadInfo(const int& connected_socket_file_descriptor,
 // @Brief: Send http head
 void HttpServer::SendHttpHead(const int& connected_socket_file_descriptor)
 {
-    std::ostringstream writting_buffer_stream(buffer_);
+    buffer_.clear();
+    std::string response_string("");
+
+    std::ostringstream writting_buffer_stream(response_string);
 
     writting_buffer_stream << "HTTP/1.1 200 OK\nServer: YWeb "<<
         ErrorHandler::version_ << "\nContent-Length: " <<
         length_of_request_file_<< "\nConnection:close\nContent-Type: "
         << request_file_type_ << "\n\n";
+
+    buffer_ = writting_buffer_stream.str();
+    logger_.Logging(Logger::LOG, "Header\n", buffer_, 2);
 
     write(connected_socket_file_descriptor, const_cast<char*>(buffer_.c_str()),
             buffer_.length());
@@ -139,8 +164,9 @@ void HttpServer::SendHttpHead(const int& connected_socket_file_descriptor)
 // @Brief: Send request file to client
 void HttpServer::SendRequestFile(const int& connected_socket_file_descriptor)
 {
-    int file_descriptor = open(buffer_.substr(5).c_str(), O_RDONLY);
-    int bytes_counts_from_file;
+    int file_descriptor = open(request_resource_file_name_.c_str(), O_RDONLY);
+    int bytes_counts_from_file = 0;
+
     while((bytes_counts_from_file = read(file_descriptor,
                 const_cast<char*>(buffer_.c_str()),buffer_.length())) > 0){
 
@@ -165,7 +191,7 @@ void HttpServer::SendResponse()
                 logger_.Logging(Logger::ERROR, "system call", "fork", 0);
             }else{
                 if(pid == 0){
-                    close(connected_socket_file_descriptor);
+                    //close(connected_socket_file_descriptor);
                     // get and handle the request from client
                     GetRequest(connected_socket_file_descriptor, hit);
                     HandleRequest(connected_socket_file_descriptor, hit);
