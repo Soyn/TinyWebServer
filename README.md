@@ -10,9 +10,9 @@ on separate hosts on the Internet. Start the server first.
 
 
 # HTTP Server Demo
-
+![image](https://github.com/Soyn/TinyWebServer/blob/master/screenshots/get_method_screenshot.gif)
 # Features
  - Multi-clients Supported
  - Supported HTTP method: GET Only
  - Not supported URLs including: "...", Java, Javascript, CGI
- - Not supported directories: /, /etc, /bin, /lib, /tmp, /usr, /dev, /sbin 
+ - Not supported directories: /, /etc, /bin, /lib, /tmp, /usr, /dev, /sbin
