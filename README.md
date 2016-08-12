@@ -12,8 +12,10 @@ on separate hosts on the Internet. Start the server first.
 # HTTP Server Demo
 ![image](https://github.com/Soyn/TinyWebServer/blob/master/screenshots/home_page_screenshot.gif)
 
-# HTTP Header
-![image](https://github.com/Soyn/TinyWebServer/blob/master/screenshots/http_info_screenshot.gif)
+# HTTP Header Info
+![image](https://github.com/Soyn/TinyWebServer/blob/master/screenshots/home_page_info.png)
+![image](https://github.com/Soyn/TinyWebServer/blob/master/screenshots/image_info.png)
+
 # Features
  - Multi-clients Supported
  - Supported HTTP method: GET Only
