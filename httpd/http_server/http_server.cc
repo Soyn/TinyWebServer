@@ -46,8 +46,8 @@ void HttpServer::GetRequest(const int& connected_socket_file_descriptor,
     buffer_ = copy_of_buffer;
 
     std::replace_if(buffer_.begin(), buffer_.end(), IsDelimiter, '*');
-
-    logger_.Logging(Logger::LOG, "request: ", buffer_, hit);
+    if(bytes_counts_from_socket > 0)
+        logger_.Logging(Logger::LOG, "request: ", buffer_, hit);
     if((bytes_counts_from_socket == 0) || (bytes_counts_from_socket == -1)){
         logger_.Logging(Logger::FORBIDDEN, "failed to read browser request",
                         " ", connected_socket_file_descriptor);
@@ -75,13 +75,8 @@ void HttpServer::HandleRequest(const int& connected_socket_file_descriptor,int h
 supported", buffer_, connected_socket_file_descriptor);
     }
 
-    std::string request_URL = buffer_.substr(0, 5);
-    if(request_URL == "GET /" || request_URL == "get /"){
-        buffer_.replace(0, 5, "GET /index.html");
-    }
-
-    bool supported_file_type = false;
     GetTheRequestFileName();
+    bool supported_file_type = false;
 
     auto iter = SupportFileType.find(request_file_type_);
     if(iter != SupportFileType.end()){
@@ -99,19 +94,26 @@ supported", buffer_, connected_socket_file_descriptor);
 // @Note: Private method
 void HttpServer::GetTheRequestFileName()
 {
-    int i = 4;
+    unsigned int i = 4;
     while(i < buffer_.size() && buffer_[i] != ' '){
         ++i;
     }
-    request_resource_file_name_ = buffer_.substr(5, i - 5);
-    for(i = 0; i < request_resource_file_name_.size() ; ++i){
-        if(request_resource_file_name_[i] == '.'){
-            break;
+    if(i > 5){
+        request_resource_file_name_ = buffer_.substr(5, i - 5);
+        for(i = 0; i < request_resource_file_name_.size() ; ++i){
+            if(request_resource_file_name_[i] == '.'){
+                break;
+            }
         }
+        request_file_type_ = request_resource_file_name_.substr(i + 1,
+            std::string::npos);
+    }else{
+        buffer_.replace(0, 5, "GET /index.html");
+        request_file_type_ = "html";
+        request_resource_file_name_ = "index.html";
     }
-
-    request_file_type_ = request_resource_file_name_.substr(i + 1, std::string::npos);
 }
+
 //
 //
 // @Brief: Get the http head information
@@ -129,7 +131,7 @@ void HttpServer::GetHttpHeadInfo(const int& connected_socket_file_descriptor,
         request_resource_file_name_,connected_socket_file_descriptor);
         }
 
-        logger_.Logging(Logger::LOG, "SEND", request_resource_file_name_,
+        logger_.Logging(Logger::LOG, "SEND: \n", request_resource_file_name_,
                         hit);
         request_file_stream.seekg(0, request_file_stream.end);
         auto end_position_of_file = request_file_stream.tellg();
@@ -154,7 +156,7 @@ void HttpServer::SendHttpHead(const int& connected_socket_file_descriptor)
         << request_file_type_ << "\n\n";
 
     buffer_ = writting_buffer_stream.str();
-    logger_.Logging(Logger::LOG, "Header\n", buffer_, 2);
+    logger_.Logging(Logger::LOG, "Header: \n", buffer_, 2);
 
     write(connected_socket_file_descriptor, const_cast<char*>(buffer_.c_str()),
             buffer_.length());
