@@ -73,7 +73,7 @@ The request URL was not found on this server.\n</body></html>\n");
         }
 
         case LOG: {
-            logger_file_stream << "INFO: " << s1 + " : "  + s2 + " : "
+            logger_file_stream << "INFO " << s1 +  s2 + " : "
                 << " " << year_ << "/" << month_
              << "/" << day_ << " " << hour_ << ":" << minute_ << ":" << second_
              << "\n";;

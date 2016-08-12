@@ -10,17 +10,6 @@
 // @Brief: Do some necessary work before creating socket
 void TcpSocket::ReadyWorkForCreateSocket()
 {
-    /*if(fork() != 0){
-        return;
-    }
-    signal(SIGCLD, SIG_IGN);
-    signal(SIGCLD, SIG_IGN);
-    int i;
-    for(i = 0; i < 32; ++i){
-        close(i);
-    }
-    setpgrp();
-    */
     logger_.Logging(Logger::LOG, "Yweb starting ", argument_values_[1], getpid());
 }
 //
